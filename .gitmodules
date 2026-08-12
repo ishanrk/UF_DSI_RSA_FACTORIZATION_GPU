@@ -1,0 +1,3 @@
+[submodule "third_party/cado-nfs"]
+	path = third_party/cado-nfs
+	url = https://gitlab.inria.fr/cado-nfs/cado-nfs.git

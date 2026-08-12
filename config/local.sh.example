@@ -1,0 +1,4 @@
+export CC=gcc
+export CXX=g++
+export CMAKE_BUILD_PARALLEL_LEVEL=4
+# export CUDACXX=/usr/local/cuda/bin/nvcc
