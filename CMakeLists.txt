@@ -16,6 +16,10 @@ endif()
 find_package(Git REQUIRED)
 include(cmake/cado.cmake)
 
+add_library(bwc-reference INTERFACE)
+target_include_directories(bwc-reference INTERFACE
+    ${CMAKE_SOURCE_DIR}/linalg/bwc/gpu)
+
 option(ENABLE_CUDA "Detect and enable the CUDA compiler" ON)
 set(CMAKE_CUDA_ARCHITECTURES 100 CACHE STRING "CUDA architectures; B200 is 100")
 if(ENABLE_CUDA)
