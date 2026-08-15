@@ -15,6 +15,10 @@ struct gf2_matrix {
     std::vector<uint32_t> columns;
 };
 
+// Each word packs 64 independent GF(2) vectors at the same coordinate.
+std::vector<uint64_t> matmul(gf2_matrix const & m,
+                             std::vector<uint64_t> const & x);
+
 inline void check_matrix(gf2_matrix const & m)
 {
     if (m.offsets.empty() || m.offsets.front() != 0 ||
