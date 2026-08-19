@@ -44,6 +44,9 @@ endif()
 option(BUILD_TESTING "Enable interface smoke tests" ON)
 if(BUILD_TESTING)
     enable_testing()
+    add_executable(bwc-reference-test tests/correctness/gf2.cpp)
+    target_link_libraries(bwc-reference-test PRIVATE bwc-reference)
+    add_test(NAME bwc_reference COMMAND bwc-reference-test)
     find_package(Python3 3.8 REQUIRED COMPONENTS Interpreter)
     add_test(NAME cado_interfaces
         COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/smoke/cado_interfaces.py
