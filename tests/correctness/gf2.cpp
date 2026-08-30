@@ -21,6 +21,11 @@ int main()
     std::vector<uint64_t> x{1, 2, uint64_t{1} << 63};
     std::vector<uint64_t> expected{1 ^ x[2], 0, 0, 3};
     require(bwc::matmul(m, x) == expected);
+    require(bwc::matmul_transpose(m, {8, 4, 2, 1}) ==
+            std::vector<uint64_t>({9, 1, 8}));
+    require(bwc::matmul_transpose({3, {0}, {}}, {}) ==
+            std::vector<uint64_t>({0, 0, 0}));
+    rejects([&] { bwc::matmul_transpose(m, {1}); });
     require(bwc::matmul({0, {0}, {}}, {}).empty());
     rejects([&] { bwc::matmul(m, {1}); });
     rejects([] { bwc::check_matrix({2, {}, {}}); });

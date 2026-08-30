@@ -46,4 +46,18 @@ std::vector<uint64_t> matmul(gf2_matrix const & m,
     }
     return y;
 }
+
+std::vector<uint64_t> matmul_transpose(gf2_matrix const & m,
+                                       std::vector<uint64_t> const & x)
+{
+    check_matrix(m);
+    if (x.size() != m.offsets.size() - 1)
+        throw std::invalid_argument("transpose input has wrong dimensions");
+    std::vector<uint64_t> y(m.ncols, 0);
+    for (size_t i = 0; i < x.size(); ++i) {
+        for (size_t k = m.offsets[i]; k < m.offsets[i + 1]; ++k)
+            y[m.columns[k]] ^= x[i];
+    }
+    return y;
+}
 }

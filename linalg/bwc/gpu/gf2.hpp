@@ -19,6 +19,8 @@ struct gf2_matrix {
 // Each word packs 64 independent GF(2) vectors at the same coordinate.
 std::vector<uint64_t> matmul(gf2_matrix const & m,
                              std::vector<uint64_t> const & x);
+std::vector<uint64_t> matmul_transpose(gf2_matrix const & m,
+                                       std::vector<uint64_t> const & x);
 gf2_matrix read_cado_matrix(std::istream & in, uint32_t nrows,
                            uint32_t ncols);
 
