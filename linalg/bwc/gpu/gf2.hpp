@@ -3,6 +3,7 @@
 #define BWC_GF2_HPP
 
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <istream>
@@ -23,6 +24,9 @@ std::vector<uint64_t> matmul_transpose(gf2_matrix const & m,
                                        std::vector<uint64_t> const & x);
 gf2_matrix read_cado_matrix(std::istream & in, uint32_t nrows,
                            uint32_t ncols);
+// Row b of the 64-by-64 result is stored in word b.
+std::array<uint64_t, 64> project(std::vector<uint64_t> const & x,
+                                  std::vector<uint64_t> const & y);
 
 inline void check_matrix(gf2_matrix const & m)
 {

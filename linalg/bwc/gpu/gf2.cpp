@@ -2,6 +2,20 @@
 #include "gf2.hpp"
 
 namespace bwc {
+std::array<uint64_t, 64> project(std::vector<uint64_t> const & x,
+                                  std::vector<uint64_t> const & y)
+{
+    if (x.size() != y.size())
+        throw std::invalid_argument("projection blocks have different lengths");
+    std::array<uint64_t, 64> result{};
+    for (unsigned b = 0; b < 64; ++b) {
+        for (size_t i = 0; i < x.size(); ++i)
+            if (x[i] & (uint64_t{1} << b))
+                result[b] ^= y[i];
+    }
+    return result;
+}
+
 static uint32_t read32(std::istream & in)
 {
     unsigned char bytes[4];

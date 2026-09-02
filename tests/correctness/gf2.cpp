@@ -26,6 +26,14 @@ int main()
     require(bwc::matmul_transpose({3, {0}, {}}, {}) ==
             std::vector<uint64_t>({0, 0, 0}));
     rejects([&] { bwc::matmul_transpose(m, {1}); });
+    auto const p = bwc::project({1, 2, x[2]}, {4, 8, 16});
+    require(p[0] == 4 && p[1] == 8 && p[63] == 16 && p[2] == 0);
+    require(bwc::project({1, 1}, {x[2], x[2]}) ==
+            std::array<uint64_t, 64>{});
+    std::vector<uint64_t> const z{8, 4, 2, 1};
+    require(bwc::project(z, bwc::matmul(m, x)) ==
+            bwc::project(bwc::matmul_transpose(m, z), x));
+    rejects([] { bwc::project({1}, {}); });
     require(bwc::matmul({0, {0}, {}}, {}).empty());
     rejects([&] { bwc::matmul(m, {1}); });
     rejects([] { bwc::check_matrix({2, {}, {}}); });
