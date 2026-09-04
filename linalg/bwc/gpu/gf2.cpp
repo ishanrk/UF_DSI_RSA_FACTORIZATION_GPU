@@ -2,6 +2,23 @@
 #include "gf2.hpp"
 
 namespace bwc {
+std::vector<std::array<uint64_t, 64>> krylov(gf2_matrix const & m,
+    std::vector<uint64_t> const & x, std::vector<uint64_t> y, size_t count)
+{
+    check_matrix(m);
+    if (m.offsets.size() - 1 != m.ncols ||
+        x.size() != m.ncols || y.size() != m.ncols)
+        throw std::invalid_argument("Krylov reference requires square dimensions");
+    // Small CPU reference for X^T M^i Y, before CADO balancing/permutations.
+    std::vector<std::array<uint64_t, 64>> sequence;
+    for (size_t i = 0; i < count; ++i) {
+        sequence.push_back(project(x, y));
+        if (i + 1 < count)
+            y = matmul(m, y);
+    }
+    return sequence;
+}
+
 std::array<uint64_t, 64> project(std::vector<uint64_t> const & x,
                                   std::vector<uint64_t> const & y)
 {

@@ -34,6 +34,15 @@ int main()
     require(bwc::project(z, bwc::matmul(m, x)) ==
             bwc::project(bwc::matmul_transpose(m, z), x));
     rejects([] { bwc::project({1}, {}); });
+    bwc::gf2_matrix const swap{2, {0, 1, 2}, {1, 0}};
+    auto const sequence = bwc::krylov(swap, {1, 2}, {1, 2}, 4);
+    require(sequence.size() == 4);
+    require(sequence[0][0] == 1 && sequence[0][1] == 2);
+    require(sequence[1][0] == 2 && sequence[1][1] == 1);
+    require(sequence[0] == sequence[2] && sequence[1] == sequence[3]);
+    require(bwc::krylov(swap, {1, 2}, {1, 2}, 0).empty());
+    rejects([&] { bwc::krylov(m, x, x, 1); });
+    rejects([&] { bwc::krylov(swap, {1}, {1, 2}, 1); });
     require(bwc::matmul({0, {0}, {}}, {}).empty());
     rejects([&] { bwc::matmul(m, {1}); });
     rejects([] { bwc::check_matrix({2, {}, {}}); });

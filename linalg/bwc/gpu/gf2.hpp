@@ -27,6 +27,8 @@ gf2_matrix read_cado_matrix(std::istream & in, uint32_t nrows,
 // Row b of the 64-by-64 result is stored in word b.
 std::array<uint64_t, 64> project(std::vector<uint64_t> const & x,
                                   std::vector<uint64_t> const & y);
+std::vector<std::array<uint64_t, 64>> krylov(gf2_matrix const & m,
+    std::vector<uint64_t> const & x, std::vector<uint64_t> y, size_t count);
 
 inline void check_matrix(gf2_matrix const & m)
 {
