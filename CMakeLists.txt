@@ -20,6 +20,8 @@ add_library(bwc-reference STATIC linalg/bwc/gpu/gf2.cpp)
 target_include_directories(bwc-reference PUBLIC
     ${CMAKE_SOURCE_DIR}/linalg/bwc/gpu)
 target_compile_options(bwc-reference PRIVATE -Wall -Wextra -Wpedantic)
+add_library(glas-reference INTERFACE)
+target_include_directories(glas-reference INTERFACE ${CMAKE_SOURCE_DIR}/sieve/glas)
 
 option(ENABLE_CUDA "Detect and enable the CUDA compiler" ON)
 set(CMAKE_CUDA_ARCHITECTURES 100 CACHE STRING "CUDA architectures; B200 is 100")
