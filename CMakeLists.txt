@@ -49,6 +49,9 @@ if(BUILD_TESTING)
     add_executable(bwc-reference-test tests/correctness/gf2.cpp)
     target_link_libraries(bwc-reference-test PRIVATE bwc-reference)
     add_test(NAME bwc_reference COMMAND bwc-reference-test)
+    add_executable(glas-reference-test sieve/glas/tests/special-q.cpp)
+    target_link_libraries(glas-reference-test PRIVATE glas-reference)
+    add_test(NAME glas_reference COMMAND glas-reference-test)
     find_package(Python3 3.8 REQUIRED COMPONENTS Interpreter)
     add_test(NAME cado_interfaces
         COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/smoke/cado_interfaces.py
