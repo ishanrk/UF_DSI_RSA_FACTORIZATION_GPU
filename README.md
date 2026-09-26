@@ -1,55 +1,27 @@
-# gpu-nfs
+# GPU NFS
 
 Work in progress.
 
-Setting up an experimental GPU implementation of the expensive stages of
-CADO-NFS, following the general approach described in
-[Eric Lu's RSA-260 factorization writeup](https://cognition.com/blog/factoring-rsa-260).
-This is an independent implementation based on the public description.
-Initial work is focused on CADO compatibility, correctness tests, and
-reproducible CPU/GPU baselines.
+## Implemented
 
-## Current progress
+Block Wiedemann CPU references read CADO matrices and compute packed GF(2)
+products, transpose products, block projections, and short Krylov sequences.
 
-- Official [CADO-NFS](https://gitlab.inria.fr/cado-nfs/cado-nfs) is pinned as a
-  submodule at `692ecb7e62f0f3bdab88ee44cc60b8ded0ea1a1b`.
-- CMake provides upstream CPU reference targets and optional CUDA detection,
-  with configurable architecture `100` for B200.
-- Interface smoke tests cover CADO command lines, workunit validation and
-  checksums, factor-base generation, and deterministic special-q enumeration.
-- The benchmark recorder writes commands, revisions, parameters, timing, and
-  relation counts to JSON. Unmeasured GPU fields remain `null`.
-- CPU BWC references read CADO's GF(2) matrices and implement packed forward
-  and transpose products, 64-column projections, and short Krylov sequences.
-- `glas-todo-check` reads CADO special-q lists for 32-bit affine roots.
-  An unreduced lattice basis and membership checks provide initial references.
-- GPU sieve kernels, CUDA block Wiedemann, `gps1`, filtering changes, GPU
-  square root, and coordinator changes are still scaffolding.
+The siever code reads CADO lists of 32 bit affine special q entries, constructs
+an unreduced lattice basis, and checks lattice membership. The todo checker
+is tested against lists produced by CADO's `las`.
 
-RSA-140 is the initial end-to-end correctness target; C155 is the next
-comparison target. Neither has been run here. Next are comparisons against
-CADO's BWC arithmetic and skew-reduced lattice setup, retaining CADO formats.
+## Tasks
 
-## Build and check the CPU reference
+Ivan Koshkin: compare the GF(2) forward and transpose products in
+[gf2.cpp](linalg/bwc/gpu/gf2.cpp) with CADO's CPU BWC on small matrices.
+Add a comparison test that checks every output bit, including empty rows.
 
-Requires CMake, Ninja, GCC/G++, GMP development headers, and Python 3.
-CUDA is optional for these CPU checks; B200 builds require CUDA 12.8 or newer.
+## To read
 
-```sh
-git submodule update --init third_party/cado-nfs
-cmake -S . -B build -G Ninja
-cmake --build build --parallel 2
-CMAKE_BUILD_PARALLEL_LEVEL=2 cmake --build build --target cado-smoke
-ctest --test-dir build --output-on-failure
-```
-
-Validate a CADO-generated todo list with `build/glas-todo-check -todo FILE`.
-The smoke target also checks this reader against upstream `las` output.
-
-## Read
-
-- [Eric Lu — Factoring RSA-260](https://cognition.com/blog/factoring-rsa-260)
-- [Factorization of RSA-140 using the number field sieve](https://ir.cwi.nl/pub/4524)
-- [Comparing the difficulty of factorization and discrete logarithm: a 240-digit experiment](https://arxiv.org/abs/2006.06197)
-- [Cofactorization on Graphics Processing Units](https://eprint.iacr.org/2014/397)
-- [Iterative Sparse Matrix-Vector Multiplication for Integer Factorization on GPUs](https://link.springer.com/chapter/10.1007/978-3-642-23397-5_41)
+1. [Eric Lu, Factoring RSA 260](https://cognition.com/blog/factoring-rsa-260). Describes GPU polynomial selection, lattice sieving, block Wiedemann, filtering, and square root work, with measurements and changes to CADO's pipeline.
+2. [Factorization of RSA 140 using the number field sieve](https://ir.cwi.nl/pub/4524). Reports the RSA 140 factorization and explains how improved polynomial selection reduced the computation required relative to estimates based on RSA 130.
+3. [Comparing the difficulty of factorization and discrete logarithm: a 240 digit experiment](https://arxiv.org/abs/2006.06197). Compares RSA 240 factorization and a discrete logarithm computation using the same hardware and software, and reports the RSA 250 factorization.
+4. [Solving homogeneous linear equations over GF(2) via block Wiedemann algorithm](https://www.ams.org/journals/mcom/1994-62-205/S0025-5718-1994-1192970-7/S0025-5718-1994-1192970-7.pdf). Develops the block Wiedemann method for sparse GF(2) systems, packing vectors into words and using a block recurrence to recover solutions with low storage requirements.
+5. [Cofactorization on Graphics Processing Units](https://eprint.iacr.org/2014/397). Moves cofactorization during NFS relation collection to a GPU so CPU workers can concentrate on sieving and produce more useful relations.
+6. [Iterative Sparse Matrix Vector Multiplication for Integer Factorization on GPUs](https://link.springer.com/chapter/10.1007/978-3-642-23397-5_41). Presents a CUDA implementation using a hybrid sparse matrix format to accelerate the repeated GF(2) products required by block Wiedemann and block Lanczos.
