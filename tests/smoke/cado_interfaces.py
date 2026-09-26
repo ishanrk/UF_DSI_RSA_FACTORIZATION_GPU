@@ -12,7 +12,7 @@ import sys
 import tempfile
 
 
-def check_interfaces(source, binary):
+def check_interfaces(source, binary, glas_todo=None):
     sys.dont_write_bytecode = True
     sys.path.insert(0, str(source / "scripts"))
     from cadofactor import cadoprograms
@@ -97,6 +97,19 @@ def check_interfaces(source, binary):
         assert rows == [line.split() for line in second.splitlines()
                         if line.strip() and not line.startswith("#")]
         assert rows
+        if glas_todo:
+            checker = [str(glas_todo), "-todo"]
+            result = subprocess.run(checker + [str(Path(tmp) / "todo")],
+                                    check=True, capture_output=True, text=True)
+            assert result.stdout == f"Checked {len(rows)} affine special-q entries\n"
+            for text in ("1 101 -1\n", "1 4294967296 0\n", "1 101 7 extra\n"):
+                bad = Path(tmp) / "bad.todo"
+                bad.write_text(text)
+                rejected = subprocess.run(checker + [str(bad)], capture_output=True)
+                assert rejected.returncode == 1 and rejected.stderr
+            missing = subprocess.run(checker + [str(Path(tmp) / "missing")],
+                                     capture_output=True)
+            assert missing.returncode == 1 and missing.stderr
         for side, q, rho in rows:
             assert int(side) == 1 and 50000 <= int(q) < 50100
             assert (3000 * int(rho)**3 - 1157101 * int(rho)**2
@@ -107,7 +120,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--cado-source", type=Path, required=True)
     parser.add_argument("--cado-binary", type=Path)
+    parser.add_argument("--glas-todo", type=Path)
     options = parser.parse_args()
     check_interfaces(options.cado_source.resolve(),
-                     options.cado_binary.resolve() if options.cado_binary else None)
+                     options.cado_binary.resolve() if options.cado_binary else None,
+                     options.glas_todo.resolve() if options.glas_todo else None)
     print("CADO interface checks passed")

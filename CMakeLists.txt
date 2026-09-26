@@ -55,6 +55,8 @@ if(BUILD_TESTING)
     add_executable(glas-reference-test sieve/glas/tests/special-q.cpp)
     target_link_libraries(glas-reference-test PRIVATE glas-reference)
     add_test(NAME glas_reference COMMAND glas-reference-test)
+    add_test(NAME glas_todo_usage COMMAND glas-todo-check)
+    set_tests_properties(glas_todo_usage PROPERTIES WILL_FAIL TRUE)
     find_package(Python3 3.8 REQUIRED COMPONENTS Interpreter)
     add_test(NAME cado_interfaces
         COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/smoke/cado_interfaces.py
@@ -63,6 +65,7 @@ if(BUILD_TESTING)
         COMMAND ${CMAKE_COMMAND} --build ${CADO_BINARY_DIR} --target las makefb
         COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/smoke/cado_interfaces.py
                 --cado-source ${CADO_SOURCE_DIR} --cado-binary ${CADO_BINARY_DIR}
-        DEPENDS cado_cpu-configure
+                --glas-todo $<TARGET_FILE:glas-todo-check>
+        DEPENDS cado_cpu-configure glas-todo-check
         USES_TERMINAL)
 endif()

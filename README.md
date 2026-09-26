@@ -19,14 +19,16 @@ reproducible CPU/GPU baselines.
   checksums, factor-base generation, and deterministic special-q enumeration.
 - The benchmark recorder writes commands, revisions, parameters, timing, and
   relation counts to JSON. Unmeasured GPU fields remain `null`.
-- `gps1`, `glas`, filtering changes, CUDA block Wiedemann, GPU square root,
-  and coordinator changes are still scaffolding. GPU algorithms and
-  performance results are not available yet.
+- CPU BWC references read CADO's GF(2) matrices and implement packed forward
+  and transpose products, 64-column projections, and short Krylov sequences.
+- `glas-todo-check` reads CADO special-q lists for 32-bit affine roots.
+  An unreduced lattice basis and membership checks provide initial references.
+- GPU sieve kernels, CUDA block Wiedemann, `gps1`, filtering changes, GPU
+  square root, and coordinator changes are still scaffolding.
 
 RSA-140 is the initial end-to-end correctness target; C155 is the next
-comparison target. Neither has been run here. The next step is `glas` command
-handling and special-q enumeration against CADO's CPU reference, retaining
-CADO's parameter, workunit, and relation formats.
+comparison target. Neither has been run here. Next are comparisons against
+CADO's BWC arithmetic and skew-reduced lattice setup, retaining CADO formats.
 
 ## Build and check the CPU reference
 
@@ -36,9 +38,13 @@ CUDA is optional for these CPU checks; B200 builds require CUDA 12.8 or newer.
 ```sh
 git submodule update --init third_party/cado-nfs
 cmake -S . -B build -G Ninja
+cmake --build build --parallel 2
 CMAKE_BUILD_PARALLEL_LEVEL=2 cmake --build build --target cado-smoke
 ctest --test-dir build --output-on-failure
 ```
+
+Validate a CADO-generated todo list with `build/glas-todo-check -todo FILE`.
+The smoke target also checks this reader against upstream `las` output.
 
 ## Read
 
